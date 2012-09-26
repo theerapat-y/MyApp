@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+[% IF c.req.uri.search('formfu_create') %]
+    [% SET tab_name = 'Create Book' %]
+    [% SET page_name = 'formfu_create' %]
+[% ELSIF c.req.uri.search('formfu_edit') %]
+    [% SET tab_name = 'Update Book' %]
+[% ELSE %]
+    [% SET tab_name = template.title or site.title %]
+    [% SET page_name = 'list' %]
+[% END %]
+<title>[% tab_name %]</title>
+<script src="[% c.uri_for('/static/js/jquery-1.8.2.min.js') %]"></script> 
+<script src="[% c.uri_for('/static/js/bootstrap.min.js') %]"></script> 
+<link rel="stylesheet" href="[% c.uri_for('/static/css/main.css') %]" />
+<link rel="stylesheet" href="[% c.uri_for('/static/css/bootstrap.css') %]" />
+</head>
+ 
+<body>
+<div id="outer">
+<div id="header">
+    [%# Your logo could go here -%]
+    <img src="[% c.uri_for('/static/img/btn_88x31_powered.png') %]" />
+    [%# Insert the page title -%]
+    <h1>[% tab_name %]</h1>
+</div>
+ 
+<div id="bodyblock">
+<div>
+    <ul class="nav nav-tabs">
+        <li><a href="[% c.uri_for('/') %]" title="Catalyst Welcome Page">Welcome</a></li>
+        [% IF c.req.uri.search('formfu') %]
+            <li><a href="[% c.uri_for('/books/list') %]">Book List</a></li>
+        [% END %]
+        <li class="active"><a href="[% c.uri_for('/books/list') %]">[% tab_name %]</a></li>
+        [% IF c.req.uri.search('list') %]
+            <li><a href="[% c.uri_for('/books/formfu_create') %]">Create Book</a></li>
+        [% END %]
+        [% IF c.user_exists %]
+        <li><a href="[% c.uri_for('/logout') %]">Logout</a></li>
+        [% END %]
+    </ul>
+</div><!-- end menu -->
+ 
+<div id="content">
+    [%# Status and error messages %]
+    <div id="warningdiv" class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+            <label id="lblstatus">[% status_msg %]</label>
+    </div>
+    <div id="alertdiv" class="alert alert-error">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+            <label id="lblerror">[% error_msg %]</label>
+    </div>
+    <script>
+        $(document).ready(function() {
+            if($("#lblstatus").text() == ""){
+                $("#warningdiv").alert('close');
+            } else {
+                if($("#lblstatus").text().indexOf('delete') != -1 || $("#lblstatus").text().indexOf('edit') != -1 || $("#lblstatus").text().indexOf('Please') != -1) {
+                    $("#warningdiv").attr("class", "alert");
+                }
+                $("#warningdiv").alert();
+            }
+            
+            if($("#lblerror").text() == ""){
+                $("#alertdiv").alert('close');
+            } else {
+                $("#alertdiv").alert();
+            }
+        });
+    </script>
+    [%# This is where TT will stick all of your template's contents. -%]
+    [% content %]
+</div><!-- end content -->
+</div><!-- end bodyblock -->
+ 
+<div id="footer">Copyright (c) Theerapat Yimsirikul</div>
+</div><!-- end outer -->
+ 
+</body>
+</html>

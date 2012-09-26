@@ -1,0 +1,85 @@
+[% # This is a TT comment. -%]
+ 
+[%- # Provide a title -%]
+[% META title = 'Book List' -%]
+ 
+[% # Note That the '-' at the beginning or end of TT code  -%]
+[% # "chomps" the whitespace/newline at that end of the    -%]
+[% # output (use View Source in browser to see the effect) -%]
+ 
+[% # Some basic HTML with a loop to display books -%]
+<table class="table table-bordered">
+<tr><th>Title</th><th>Rating</th><th>Author(s)</th>
+    [% IF c.check_user_roles('admin') %]<th>Action</th>[% END %]</tr>
+[% # Display each book in a table row %]
+[% FOREACH book IN books -%]
+  <tr>
+    <td>[% book.title %]</td>
+    <td>
+      <code>
+        [% FOR [ 1 .. book.rating] %]
+          <i class="icon-star"></i>
+        [% END %]
+        [% white_star = 5 - book.rating %]
+        [% IF white_star > 0 %]
+          [% FOR [ 1 .. white_star] %]
+            <i class="icon-star icon-white"></i>
+          [% END %]
+        [% END %]
+      </code>
+    </td>
+    <td>
+      [% # NOTE: See Chapter 4 for a better way to do this!                      -%]
+      [% # First initialize a TT variable to hold a list.  Then use a TT FOREACH -%]
+      [% # loop in 'side effect notation' to load just the last names of the     -%]
+      [% # authors into the list. Note that the 'push' TT vmethod doesn't return -%]
+      [% # a value, so nothing will be printed here.  But, if you have something -%]
+      [% # in TT that does return a value and you don't want it printed, you     -%]
+      [% # 1) assign it to a bogus value, or                                     -%]
+      [% # 2) use the CALL keyword to call it and discard the return value.      -%]
+      [% tt_authors = [ ];
+         tt_authors.push(author.last_name) FOREACH author = book.authors %]
+      [% # Now use a TT 'virtual method' to display the author count in parens   -%]
+      [% # Note the use of the TT filter "| html" to escape dangerous characters -%]
+      ([% tt_authors.size | html %])
+      [% # Use another TT vmethod to join & print the names & comma separators   -%]
+      [% tt_authors.join(', ') | html %]
+    </td>
+    [% IF c.check_user_roles('admin') %]
+    <td>
+    [% # Add a link to delete a book %]
+      <button type="button" data-toggle="modal" data-target="#confirmDel[% book.id %]" class="btn btn-danger">Delete</button>
+<div class="modal hide fade" id="confirmDel[% book.id %]" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display:none;">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Delete confirmation</h3>
+  </div>
+  <div class="modal-body">
+    <p>You are about to delete '[% book.title %]'.</p></br>
+    <p>This action is permanent. Are you sure?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <a href="[% c.uri_for(c.controller.action_for('delete'), [book.id]) %]" class="btn btn-danger">Delete</a>
+  </div>
+</div>
+    [% # Add a link to edit a book %]
+      <a href="[%
+        c.uri_for(c.controller.action_for('formfu_edit'), [book.id]) %]" class="btn btn-warning">Edit</a>
+    </td>
+    [% END %]
+  </tr>
+[% END -%]
+</table>
+[% IF c.check_user_roles('admin') %]
+<p>
+  <a href="[% c.uri_for(c.controller.action_for('formfu_create')) %]" class="btn btn-primary">Create</a>
+</p>
+[% END %]
+
+Hello [% c.user.username %], you have the following roles:</p>
+ 
+<ul>
+  [% # Dump list of roles -%]
+  [% FOR role = c.user.roles %]<li>[% role %]</li>[% END %]
+</ul>

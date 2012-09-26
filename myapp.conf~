@@ -1,0 +1,54 @@
+<Plugin::Static::Simple>
+    no_logs   1
+    include_path   /home/theerapat/Documents/testWeb/MyApp/root
+    ignore_extensions   tmpl
+    ignore_extensions   tt
+    ignore_extensions   tt2
+    ignore_extensions   html
+    ignore_extensions   xhtml
+    mime_types_obj   MIME::Types=HASH(0x46cfbd8)
+    <mime_types>
+    </mime_types>
+    debug   0
+</Plugin::Static::Simple>
+disable_component_resolution_regex_fallback   1
+<Plugin::ConfigLoader>
+</Plugin::ConfigLoader>
+name   MyApp
+<static>
+    no_logs   1
+    include_path   /home/theerapat/Documents/testWeb/MyApp/root
+    ignore_extensions   tmpl
+    ignore_extensions   tt
+    ignore_extensions   tt2
+    ignore_extensions   html
+    ignore_extensions   xhtml
+    mime_types_obj   MIME::Types=HASH(0x46cfbd8)
+    <mime_types>
+    </mime_types>
+    debug   0
+</static>
+<Plugin::Session>
+    verify_address   0
+    cookie_name   myapp_session
+    verify_user_agent   0
+    expires   7200
+</Plugin::Session>
+<stacktrace>
+    verbose   0
+    context   3
+</stacktrace>
+<Plugin::Authentication>
+    use_session   1
+    <default>
+        password_type   clear
+        user_model   DB::User
+        class   SimpleDB
+    </default>
+</Plugin::Authentication>
+<View::HTML>
+    INCLUDE_PATH   /home/theerapat/Documents/testWeb/MyApp/root/src
+</View::HTML>
+enable_catalyst_header   1
+root   /home/theerapat/Documents/testWeb/MyApp/root
+home   /home/theerapat/Documents/testWeb/MyApp
