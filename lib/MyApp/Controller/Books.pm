@@ -50,42 +50,6 @@ sub list :Chained('base') :PathParth('list') :Args(0) {
     $c->stash(template => 'books/list.tt2');
 }
 
-=head2 url_create
- 
-Create a book with the supplied title, rating, and author
- 
-=cut
- 
-sub url_create :Chained('base') :PathPart('url_create') :Args(3) {
-    # In addition to self & context, get the title, rating & author_id args
-    # from the URL.  Note that Catalyst automatically puts extra information
-    # after the "/<controller_name>/<action_name/" into @_
-    my ($self, $c, $title, $rating, $author_id) = @_;
- 
-    # Check the user's roles
-    if ($c->check_user_roles('admin')) {
-        # Call create() on the book model object. Pass the table
-        # columns/field values we want to set as hash values
-        my $book = $c->model('DB::Book')->create({
-                title   => $title,
-                rating  => $rating
-            });
- 
-        # Add a record to the join table for this book, mapping to
-        # appropriate author
-        $book->add_to_book_authors({author_id => $author_id});
-        # Note: Above is a shortcut for this:
-        # $book->create_related('book_authors', {author_id => $author_id});
- 
-        # Assign the Book object to the stash and set template
-        $c->stash(book     => $book,
-                  template => 'books/create_done.tt2');
-    } else {
-        # Provide very simple feedback to the user.
-        $c->response->body('Unauthorized');
-    }
-}
-
 =head2 base
  
 Can place common logic to start chained dispatch here
@@ -103,48 +67,6 @@ sub base :Chained('/') :PathPart('books') :CaptureArgs(0) {
  
     # Load status messages
     $c->load_status_msgs;
-}
-
-=head2 form_create
- 
-Display form to collect information for book to create
- 
-=cut
- 
-sub form_create :Chained('base') :PathPart('form_create') :Args(0) {
-    my ($self, $c) = @_;
- 
-    # Set the TT template to use
-    $c->stash(template => 'books/form_create.tt2');
-}
-
-=head2 form_create_do
- 
-Take information from form and add to database
- 
-=cut
- 
-sub form_create_do :Chained('base') :PathPart('form_create_do') :Args(0) {
-    my ($self, $c) = @_;
- 
-    # Retrieve the values from the form
-    my $title     = $c->request->params->{title}     || 'N/A';
-    my $rating    = $c->request->params->{rating}    || 'N/A';
-    my $author_id = $c->request->params->{author_id} || '1';
- 
-    # Create the book
-    my $book = $c->model('DB::Book')->create({
-            title   => $title,
-            rating  => $rating,
-        });
-    # Handle relationship with author
-    $book->add_to_book_authors({author_id => $author_id});
-    # Note: Above is a shortcut for this:
-    # $book->create_related('book_authors', {author_id => $author_id});
- 
-    # Store new model object in stash and set template
-    $c->stash(book     => $book,
-              template => 'books/create_done.tt2');
 }
 
 =head2 object
