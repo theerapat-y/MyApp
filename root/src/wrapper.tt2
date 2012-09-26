@@ -30,7 +30,6 @@
 <div id="bodyblock">
 <div>
     <ul class="nav nav-tabs">
-        <li><a href="[% c.uri_for('/') %]" title="Catalyst Welcome Page">Welcome</a></li>
         [% IF c.req.uri.search('formfu') %]
             <li><a href="[% c.uri_for('/books/list') %]">Book List</a></li>
         [% END %]
