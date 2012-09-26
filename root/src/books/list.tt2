@@ -8,6 +8,12 @@
 [% # output (use View Source in browser to see the effect) -%]
  
 [% # Some basic HTML with a loop to display books -%]
+
+[% IF c.check_user_roles('admin') %]
+<p>
+  <a href="[% c.uri_for(c.controller.action_for('formfu_create')) %]" class="btn btn-large btn-primary">Create new book</a>
+</p>
+[% END %]
 <table class="table table-bordered">
 <tr><th>Title</th><th>Rating</th><th>Author(s)</th>
     [% IF c.check_user_roles('admin') %]<th>Action</th>[% END %]</tr>
@@ -71,11 +77,6 @@
   </tr>
 [% END -%]
 </table>
-[% IF c.check_user_roles('admin') %]
-<p>
-  <a href="[% c.uri_for(c.controller.action_for('formfu_create')) %]" class="btn btn-large btn-primary">Create new book</a>
-</p>
-[% END %]
 
 Hello [% c.user.username %], you have the following roles:</p>
  
