@@ -34,7 +34,7 @@
         [% IF c.req.uri.search('formfu') %]
             <li><a href="[% c.uri_for('/books/list') %]">Book List</a></li>
         [% END %]
-        <li class="active"><a href="[% c.uri_for('/books/list') %]">[% tab_name %]</a></li>
+        <li class="active"><a>[% tab_name %]</a></li>
         [% IF c.req.uri.search('list') %]
             <li><a href="[% c.uri_for('/books/formfu_create') %]">Create Book</a></li>
         [% END %]
