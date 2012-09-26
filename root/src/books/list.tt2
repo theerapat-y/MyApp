@@ -53,6 +53,9 @@
     </td>
     [% IF c.check_user_roles('admin') %]
     <td>
+    [% # Add a link to edit a book %]
+      <a href="[%
+        c.uri_for(c.controller.action_for('formfu_edit'), [book.id]) %]" class="btn btn-warning">Edit</a>
     [% # Add a link to delete a book %]
       <button type="button" data-toggle="modal" data-target="#confirmDel[% book.id %]" class="btn btn-danger">Delete</button>
 <div class="modal hide fade" id="confirmDel[% book.id %]" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display:none;">
@@ -69,9 +72,6 @@
     <a href="[% c.uri_for(c.controller.action_for('delete'), [book.id]) %]" class="btn btn-danger">Delete</a>
   </div>
 </div>
-    [% # Add a link to edit a book %]
-      <a href="[%
-        c.uri_for(c.controller.action_for('formfu_edit'), [book.id]) %]" class="btn btn-warning">Edit</a>
     </td>
     [% END %]
   </tr>
