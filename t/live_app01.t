@@ -97,6 +97,10 @@ $ua1->get_ok($delLinks[$#delLinks]->url, 'Delete last book');
 $ua1->content_contains("Book List", "Book List page test");
 $ua1->content_like(qr/TestTitle is deleted./, "deleted book #");
 
+# Check that user 'test 01' cannot update book that non exist
+$ua1->get_ok("http://localhost/books/id/0/formfu_edit", "'test01' try edit non-exist book");
+$ua1->content_contains("Invalid book", "Check 'test01' cannot edit");
+
 # User 'test02' should not be able to add a book
 $ua2->get_ok("http://localhost/books/formfu_create", "'test02' try access formfu create");
 $ua2->content_contains("not authorized", "Check 'test02' cannot access");
