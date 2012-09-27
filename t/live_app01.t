@@ -130,7 +130,7 @@ $ua2->get_ok("http://localhost/books/formfu_create", "'test02' try access formfu
 $ua2->content_contains("not authorized", "Check 'test02' cannot access");
 
 # Check that user 'test 01' cannot delete book that non exist
-$ua1->get_ok("http://localhost/books/id/15/delete", "'test02' try delete book");
-$ua1->content_contains("not authorized", "'Check 'test02' cannot perform delete");
+$ua2->get_ok("http://localhost/books/id/15/delete", "'test02' try delete book");
+$ua2->content_contains("not authorized", "'Check 'test02' cannot perform delete");
  
 done_testing();
