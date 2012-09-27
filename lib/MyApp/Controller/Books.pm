@@ -95,6 +95,7 @@ sub object :Chained('base') :PathPart('id') :CaptureArgs(1) {
     } else {
         $c->response->redirect($c->uri_for($self->action_for('list'),
             {mid => $c->set_error_msg("You are not authorized.")}));
+        $c->detach;
     }
 }
 
