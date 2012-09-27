@@ -106,10 +106,21 @@ Delete a book
 sub delete :Chained('object') :PathPart('delete') :Args(0) {
     my ($self, $c) = @_;
  
+    # Get the specified book already saved by the 'object' method
+    my $book = $c->stash->{object};
+  
+    # Make sure we were able to get a book
+    unless ($book) {
+        # Set an error message for the user & return to books list
+        $c->response->redirect($c->uri_for($self->action_for('list'),
+            {mid => $c->set_error_msg("Invalid book -- Cannot delete")}));
+        $c->detach;
+    }
+
     # Saved the PK id for status_msg below
     # my $id = $c->stash->{object}->id;
     my $bookname = $c->stash->{object}->title;
- 
+
     # Use the book object saved by 'object' and delete it along
     # with related 'book_authors' entries
     $c->stash->{object}->delete;
