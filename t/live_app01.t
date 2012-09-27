@@ -75,9 +75,11 @@ $ua1->submit_form(
         title => 'TestTitle',
         rating => '5',
         authors => '1'
-    });
+        },
+        button => 'submit'
+    );
 
-$ua1->content_contains("Book Created", "Book created notification");
+ $ua1->content_contains("Book created", "Book created notification");
 
 # $ua1->content_contains("Added book 'TestTitle'", "Check title added OK");
 # $ua1->content_contains("by 'Stevens'", "Check author added OK");
