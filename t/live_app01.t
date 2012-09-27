@@ -87,6 +87,26 @@ $ua1->get_ok("http://localhost/books/list", "'test01' book list");
 $ua1->title_is("Book List", "Check logged in and at book list");
 $ua1->content_contains("Book List", "Book List page test");
 $ua1->content_contains("TestTitle", "Check book added OK");
+
+# Check the new book can be edit
+# Get all the Edit links on the list page
+my @editLinks = $ua1->find_all_links(text => 'Edit');
+# Use the final link to edit the last book
+$ua1->get_ok($editLinks[$#editLinks]->url, 'Edit last book');
+# Check title in edit page
+$ua1->title_is("Update Book", "Check user 'test01' in 'Update book'");
+# Edit the book
+$ua1->submit_form(
+    fields => {
+        title => 'TestTitleEdit',
+        rating => '5',
+        authors => '1'
+        },
+        button => 'submit'
+    );
+# Check that edit worked
+$ua1->content_contains("Book List", "Book List page test");
+$ua1->content_like(qr/edited successfully/, "edited book #");
  
 # Make sure the new book can be deleted
 # Get all the Delete links on the list page
@@ -95,11 +115,11 @@ my @delLinks = $ua1->find_all_links(text => 'Delete');
 $ua1->get_ok($delLinks[$#delLinks]->url, 'Delete last book');
 # Check that delete worked
 $ua1->content_contains("Book List", "Book List page test");
-$ua1->content_like(qr/TestTitle is deleted./, "deleted book #");
+$ua1->content_like(qr/TestTitleEdit is deleted./, "deleted book #");
 
 # Check that user 'test 01' cannot update book that non exist
 $ua1->get_ok("http://localhost/books/id/0/formfu_edit", "'test01' try edit non-exist book");
-$ua1->content_contains("Invalid book", "Check 'test01' cannot edit");
+$ua1->content_like(qr/Invalid book/, "'Book 0 isn't exist");
 
 # User 'test02' should not be able to add a book
 $ua2->get_ok("http://localhost/books/formfu_create", "'test02' try access formfu create");
