@@ -121,6 +121,10 @@ $ua1->content_like(qr/TestTitleEdit is deleted./, "deleted book #");
 $ua1->get_ok("http://localhost/books/id/0/formfu_edit", "'test01' try edit non-exist book");
 $ua1->content_like(qr/Invalid book/, "'Book 0 isn't exist");
 
+# Check that user 'test 01' cannot delete book that non exist
+$ua1->get_ok("http://localhost/books/id/0/delete", "'test01' try delete non-exist book");
+$ua1->content_like(qr/Invalid book/, "'Book 0 isn't exist");
+
 # User 'test02' should not be able to add a book
 $ua2->get_ok("http://localhost/books/formfu_create", "'test02' try access formfu create");
 $ua2->content_contains("not authorized", "Check 'test02' cannot access");
