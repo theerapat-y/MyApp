@@ -34,7 +34,7 @@
             <li><a href="[% c.uri_for('/books/list') %]">Book List</a></li>
         [% END %]
         <li class="active"><a>[% tab_name %]</a></li>
-        [% IF c.req.uri.search('list') %]
+        [% IF c.req.uri.search('list') && c.check_user_roles('admin') %]
             <li><a href="[% c.uri_for('/books/formfu_create') %]">Create Book</a></li>
         [% END %]
         [% IF c.user_exists %]
