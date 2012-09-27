@@ -98,15 +98,7 @@ $ua1->content_contains("Book List", "Book List page test");
 $ua1->content_like(qr/TestTitle is deleted./, "deleted book #");
 
 # User 'test02' should not be able to add a book
-$ua2->get_ok("http://localhost/books/formfu_create", "'test02' formfu create page");
-$ua2->submit_form(
-    fields => {
-        title => 'TestTitle2',
-        rating => '4',
-        authors => '3'
-        },
-        button => 'submit'
-    );
-$ua2->content_contains("You are not authorized.", "Check 'test02' cannot add");
+$ua2->get_ok("http://localhost/books/formfu_create", "'test02' try access formfu create");
+$ua2->content_contains("not authorized", "Check 'test02' cannot access");
  
 done_testing();

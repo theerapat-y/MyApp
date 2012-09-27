@@ -131,36 +131,42 @@ sub formfu_create :Chained('base') :PathPart('formfu_create') :Args(0) :FormConf
  
     # Get the form that the :FormConfig attribute saved in the stash
     my $form = $c->stash->{form};
- 
-    # Check if the form has been submitted (vs. displaying the initial
-    # form) and if the data passed validation.  "submitted_and_valid"
-    # is shorthand for "$form->submitted && !$form->has_errors"
-    if ($form->submitted_and_valid) {
-        # Create a new book
-        my $book = $c->model('DB::Book')->new_result({});
-        # Save the form data for the book
-        $form->model->update($book);
-        # Set a status message for the user & return to books list
-        $c->response->redirect($c->uri_for($self->action_for('list'),
-            {mid => $c->set_status_msg("Book created")}));
-        $c->detach;
-    } else {
-        # Get the authors from the DB
-        my @author_objs = $c->model("DB::Author")->all();
-        # Create an array of arrayrefs where each arrayref is an author
-        my @authors;
-        foreach (sort {$a->last_name cmp $b->last_name} @author_objs) {
-            push(@authors, [$_->id, $_->last_name . ", " . $_->first_name ]);
+
+    #check admin role
+    if ($c->check_user_roles('admin')) {
+        # Check if the form has been submitted (vs. displaying the initial
+        # form) and if the data passed validation.  "submitted_and_valid"
+        # is shorthand for "$form->submitted && !$form->has_errors"
+        if ($form->submitted_and_valid) {
+            # Create a new book
+            my $book = $c->model('DB::Book')->new_result({});
+            # Save the form data for the book
+            $form->model->update($book);
+            # Set a status message for the user & return to books list
+            $c->response->redirect($c->uri_for($self->action_for('list'),
+                {mid => $c->set_status_msg("Book created")}));
+            $c->detach;
+        } else {
+            # Get the authors from the DB
+            my @author_objs = $c->model("DB::Author")->all();
+            # Create an array of arrayrefs where each arrayref is an author
+            my @authors;
+            foreach (sort {$a->last_name cmp $b->last_name} @author_objs) {
+                push(@authors, [$_->id, $_->last_name . ", " . $_->first_name ]);
+            }
+            # Get the select added by the config file
+            my $select = $form->get_element({type => 'Select', name => 'authors'});
+            # Add the authors to it
+            $select->options(\@authors);
         }
-        # Get the select added by the config file
-        my $select = $form->get_element({type => 'Select', name => 'authors'});
-        # Add the authors to it
-        $select->options(\@authors);
-    }
  
-    # Set the template
-    $c->stash(page_title => 'Create Book',
-        template => 'books/formfu_create.tt2');
+        # Set the template
+        $c->stash(page_title => 'Create Book',
+            template => 'books/formfu_create.tt2');
+    } else {
+        $c->response->redirect($c->uri_for($self->action_for('list'),
+            {mid => $c->set_error_msg("You are not authorized.")}));
+    }
 }
 
 =head2 formfu_edit
