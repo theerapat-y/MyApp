@@ -88,7 +88,7 @@ sub object :Chained('base') :PathPart('id') :CaptureArgs(1) {
         # Make sure the lookup was successful.  You would probably
         # want to do something like this in a real app:
         #   $c->detach('/error_404') if !$c->stash->{object};
-        die "Book $id not found!" if !$c->stash->{object};
+        # die "Book $id not found!" if !$c->stash->{object};
  
         # Print a message to the debug log
         $c->log->debug("*** INSIDE OBJECT METHOD for obj id=$id ***");
