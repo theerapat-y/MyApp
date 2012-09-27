@@ -79,17 +79,23 @@ it in the stash
 sub object :Chained('base') :PathPart('id') :CaptureArgs(1) {
     # $id = primary key of book to delete
     my ($self, $c, $id) = @_;
+
+    #check admin role
+    if ($c->check_user_roles('admin')) {
+        # Find the book object and store it in the stash
+        $c->stash(object => $c->stash->{resultset}->find($id));
  
-    # Find the book object and store it in the stash
-    $c->stash(object => $c->stash->{resultset}->find($id));
+        # Make sure the lookup was successful.  You would probably
+        # want to do something like this in a real app:
+        #   $c->detach('/error_404') if !$c->stash->{object};
+        die "Book $id not found!" if !$c->stash->{object};
  
-    # Make sure the lookup was successful.  You would probably
-    # want to do something like this in a real app:
-    #   $c->detach('/error_404') if !$c->stash->{object};
-    die "Book $id not found!" if !$c->stash->{object};
- 
-    # Print a message to the debug log
-    $c->log->debug("*** INSIDE OBJECT METHOD for obj id=$id ***");
+        # Print a message to the debug log
+        $c->log->debug("*** INSIDE OBJECT METHOD for obj id=$id ***");
+    } else {
+        $c->response->redirect($c->uri_for($self->action_for('list'),
+            {mid => $c->set_error_msg("You are not authorized.")}));
+    }
 }
 
 =head2 delete
@@ -100,24 +106,17 @@ Delete a book
 sub delete :Chained('object') :PathPart('delete') :Args(0) {
     my ($self, $c) = @_;
  
-    # Check permissions
-
-    if ($c->check_user_roles('admin')) {
-        # Saved the PK id for status_msg below
-        # my $id = $c->stash->{object}->id;
-        my $bookname = $c->stash->{object}->title;
+    # Saved the PK id for status_msg below
+    # my $id = $c->stash->{object}->id;
+    my $bookname = $c->stash->{object}->title;
  
-        # Use the book object saved by 'object' and delete it along
-        # with related 'book_authors' entries
-        $c->stash->{object}->delete;
+    # Use the book object saved by 'object' and delete it along
+    # with related 'book_authors' entries
+    $c->stash->{object}->delete;
  
-        # Redirect the user back to the list page
-        $c->response->redirect($c->uri_for($self->action_for('list'),
-            {mid => $c->set_status_msg("$bookname is deleted.")}));
-    } else {
-        $c->response->redirect($c->uri_for($self->action_for('list'),
-            {mid => $c->set_error_msg("You are not authorized.")}));
-    }
+    # Redirect the user back to the list page
+    $c->response->redirect($c->uri_for($self->action_for('list'),
+        {mid => $c->set_status_msg("$bookname is deleted.")}));
 }
 
 =head2 formfu_create
@@ -190,45 +189,39 @@ sub formfu_edit :Chained('object') :PathPart('formfu_edit') :Args(0)
         $c->detach;
     }
  
-    #check admin role
-    if ($c->check_user_roles('admin')) {
-        # Get the form that the :FormConfig attribute saved in the stash
-        my $form = $c->stash->{form};
+    # Get the form that the :FormConfig attribute saved in the stash
+    my $form = $c->stash->{form};
 
-        # Check if the form has been submitted (vs. displaying the initial
-        # form) and if the data passed validation.  "submitted_and_valid"
-        # is shorthand for "$form->submitted && !$form->has_errors"
-        if ($form->submitted_and_valid) {
-            # Save the form data for the book
-            $form->model->update($book);
-            # Set a status message for the user
-            # Set a status message for the user & return to books list
-            $c->response->redirect($c->uri_for($self->action_for('list'),
-                {mid => $c->set_status_msg("Book edited successfully.")}));
-            $c->detach;
-        } else {
-            # Get the authors from the DB
-            my @author_objs = $c->model("DB::Author")->all();
-            # Create an array of arrayrefs where each arrayref is an author
-            my @authors;
-            foreach (sort {$a->last_name cmp $b->last_name} @author_objs) {
-                push(@authors, [$_->id, $_->last_name . ", " . $_->first_name]);
-            }
-            # Get the select added by the config file
-            my $select = $form->get_element({type => 'Select', name => 'authors'});
-            # Add the authors to it
-            $select->options(\@authors);
-            # Populate the form with existing values from DB
-            $form->model->default_values($book);
-        }
- 
-        # Set the template
-        $c->stash(page_title => 'Edit Book',
-            template => 'books/formfu_create.tt2');
-    } else {
+    # Check if the form has been submitted (vs. displaying the initial
+    # form) and if the data passed validation.  "submitted_and_valid"
+    # is shorthand for "$form->submitted && !$form->has_errors"
+    if ($form->submitted_and_valid) {
+        # Save the form data for the book
+        $form->model->update($book);
+        # Set a status message for the user
+        # Set a status message for the user & return to books list
         $c->response->redirect($c->uri_for($self->action_for('list'),
-            {mid => $c->set_error_msg("You are not authorized.")}));
+            {mid => $c->set_status_msg("Book edited successfully.")}));
+        $c->detach;
+    } else {
+        # Get the authors from the DB
+        my @author_objs = $c->model("DB::Author")->all();
+        # Create an array of arrayrefs where each arrayref is an author
+        my @authors;
+        foreach (sort {$a->last_name cmp $b->last_name} @author_objs) {
+            push(@authors, [$_->id, $_->last_name . ", " . $_->first_name]);
+        }
+        # Get the select added by the config file
+        my $select = $form->get_element({type => 'Select', name => 'authors'});
+        # Add the authors to it
+        $select->options(\@authors);
+        # Populate the form with existing values from DB
+        $form->model->default_values($book);
     }
+ 
+    # Set the template
+    $c->stash(page_title => 'Edit Book',
+        template => 'books/formfu_create.tt2');
 }
 
 =head1 AUTHOR
