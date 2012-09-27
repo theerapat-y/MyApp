@@ -24,10 +24,18 @@ $_->title_is("Login", "Check for login title") for $ua1, $ua2;
 # Use content_contains() to match on text in the html body
 $_->content_contains("You need to log in to use this application",
     "Check we are NOT logged in") for $ua1, $ua2;
- 
+
 # Log in as each user
 $ua1->post_ok("http://localhost/login", {username => 'test01', password => 'mypass'},'Login as test01');
 $ua2->get_ok("http://localhost/login", "Go to login page 'test02'");
+# Try submit empty form login
+$ua2->submit_form(
+    fields => {
+        username => '',
+        password => '',
+    });
+# Warning msg should display
+$ua2->content_contains("Please enter username and password", "Check empty form cannot login");
 # Could make user2 like user1 above, but use the form to show another way
 $ua2->submit_form(
     fields => {
