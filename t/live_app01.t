@@ -59,18 +59,18 @@ $ua1->get_ok("http://localhost/books/list", "'test01' book list");
  
 $_->content_contains("Book List", "Check for book list title") for $ua1, $ua2;
 # Make sure the appropriate logout buttons are displayed
-$_->content_contains("/logout\">User Logout</a>",
+$_->content_contains("/logout\">Logout</a>",
     "Both users should have a 'User Logout'") for $ua1, $ua2;
-$ua1->content_contains("/books/form_create\">Admin Create</a>",
+$ua1->content_contains("/books/formfu_create\">Create Book</a>",
     "'test01' should have a create link");
-$ua2->content_lacks("/books/form_create\">Admin Create</a>",
+$ua2->content_lacks("/books/formfu_create\">Create Book</a>",
     "'test02' should NOT have a create link");
  
 $ua1->get_ok("http://localhost/books/list", "View book list as 'test01'");
  
-# User 'test01' should be able to create a book with the "formless create" URL
-$ua1->get_ok("http://localhost/books/url_create/TestTitle/2/4",
-    "'test01' formless create");
+# User 'test01' should be able to create a book with the "formfu create"
+$ua1->get_ok("http://localhost/books/formfu_create", "'test01' formfu create page");
+
 $ua1->title_is("Book Created", "Book created title");
 $ua1->content_contains("Added book 'TestTitle'", "Check title added OK");
 $ua1->content_contains("by 'Stevens'", "Check author added OK");
