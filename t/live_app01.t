@@ -79,20 +79,14 @@ $ua1->submit_form(
         button => 'submit'
     );
 
- $ua1->content_contains("Book created", "Book created notification");
+# Check for response if book has been created
+$ua1->content_contains("Book created", "Book created notification");
 
-# $ua1->content_contains("Added book 'TestTitle'", "Check title added OK");
-# $ua1->content_contains("by 'Stevens'", "Check author added OK");
-# $ua1->content_contains("with a rating of 2.", "Check rating added");
-# # Try a regular expression to combine the previous 3 checks & account for whitespace
-# $ua1->content_like(qr/Added book 'TestTitle'\s+by 'Stevens'\s+with a rating of 2./,
-#     "Regex check");
- 
-# # Make sure the new book shows in the list
-# $ua1->get_ok("http://localhost/books/list", "'test01' book list");
-# $ua1->title_is("Book List", "Check logged in and at book list");
-# $ua1->content_contains("Book List", "Book List page test");
-# $ua1->content_contains("TestTitle", "Look for 'TestTitle'");
+# Make sure the new book shows in the list
+$ua1->get_ok("http://localhost/books/list", "'test01' book list");
+$ua1->title_is("Book List", "Check logged in and at book list");
+$ua1->content_contains("Book List", "Book List page test");
+$ua1->content_contains("TestTitle", "Check book added OK");
  
 # # Make sure the new book can be deleted
 # # Get all the Delete links on the list page
