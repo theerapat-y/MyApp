@@ -57,7 +57,7 @@ sub index :Path :Args(0) {
             }
         } else {
             # Set an error message
-            $c->stash(status_msg => "Please enter username and password.") unless ($c->user_exists);
+            $c->stash(status_msg => "Please enter username and password.");
         }
     }
  
