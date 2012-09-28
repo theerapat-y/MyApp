@@ -36,6 +36,14 @@ $ua2->submit_form(
     });
 # Warning msg should display
 $ua2->content_contains("Please enter username and password", "Check empty form cannot login");
+# Try submit wrong password for user 'test02'
+$ua2->submit_form(
+    fields => {
+        username => 'test02',
+        password => 'wrongpassword',
+    });
+# Error msg should display
+$ua2->content_contains("Invalid username or password", "Check wrong password cannot login");
 # Could make user2 like user1 above, but use the form to show another way
 $ua2->submit_form(
     fields => {
